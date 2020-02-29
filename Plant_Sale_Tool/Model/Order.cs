@@ -14,7 +14,7 @@ namespace Plant_Sale_Tool
 
         public Order(string seller, string customer, double orderAmount)
         {
-            this.seller = seller;
+            this.seller = seller != null ? this.seller = seller : this.seller = "Unknown";
             this.customer = customer;
             this.orderAmount = orderAmount;
         }

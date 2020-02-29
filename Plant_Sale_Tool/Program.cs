@@ -34,6 +34,7 @@ namespace Plant_Sale_Tool
             {
                 pathToUse = fullDevelopmentPath;
             }
+            List<Plant> plants = null;
 
             if (File.Exists(pathToUse))
             {
@@ -42,17 +43,71 @@ namespace Plant_Sale_Tool
                 {
                     var firstSheet = package.Workbook.Worksheets["Sheet1"];
                     WorkbookHelper workbookHelper = new WorkbookHelper(firstSheet);
-                    List<Plant> plants = workbookHelper.ReadWorkBook();
-                    foreach(Plant p in plants)
+                    plants = workbookHelper.ReadWorkBook();
+                    foreach (Plant p in plants)
                     {
-                        Console.WriteLine(string.Format("{0} with {1} orders", p.Name, p.Orders.Count));
+                        Console.WriteLine(string.Format("{0} = {1} with {2} orders", p.Name, plants.IndexOf(p), p.Orders.Count));
                     }
                 }
             } else
             {
                 Console.WriteLine(string.Format("Workbook not found in {0}", pathToUse));
+                Environment.Exit(1);
             }
+    
+            bool exit = false;
+            do
+            {
+                Console.WriteLine();
+                Console.Write("Enter Plant Name or index that you want more info on:");
+                string requestedPlant = Console.ReadLine();
+                int inputIndex = 999;
+                if (!int.TryParse(requestedPlant, out inputIndex))
+                {
+                    if(requestedPlant.ToLower() == "q" || requestedPlant.ToLower() == "quit")
+                    {
+                        break;
+                    } else
+                    {
+                        foreach (Plant p in plants)
+                        {
+                            if (requestedPlant.ToLower() == p.Name.ToLower())
+                            {
+                                inputIndex = plants.IndexOf(p);
+                                break;
+                            }
+                            else
+                            {
+                                inputIndex = 999;
+                            }
+                        }
+                    }
+                } 
+                
+                    
+                if (inputIndex == 999)
+                {
+                    Console.WriteLine("Invalid selection, please make another selection.");
+                }
+                else
+                {
+                    Plant selectedPlant = plants[inputIndex];
+                    //Console.WriteLine();
+                    //Console.WriteLine(string.Format("Plant {0} has {1} orders", selectedPlant.Name, selectedPlant.Orders.Count));
+                    //Console.WriteLine(string.Format("Seller\t\t\t\tCustomer\t\t\t\tOrder Amount"));
+                    //foreach (Order o in selectedPlant.Orders)
+                    //{
+                    //    Console.WriteLine(string.Format("{0}\t\t\t\t{1}\t\t\t\t{2}", o.seller, o.customer, o.orderAmount));
+                    //}
+                    TableHelper tableHelper = new TableHelper(selectedPlant);
+
+
+                }
+                
+            } while (!exit);
             
+
+
         }
     }
 }
