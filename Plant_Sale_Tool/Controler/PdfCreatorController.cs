@@ -20,7 +20,7 @@ namespace Plant_Sale_Tool
             _converter = converter;
         }
 
-        //[HttpGet]
+        
         public byte[] CreatePDF(string HtmlContent, string plantName)
         {
             var globalSettings = new GlobalSettings
@@ -37,12 +37,8 @@ namespace Plant_Sale_Tool
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                //HtmlContent = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. In consectetur mauris eget ultrices  iaculis. Ut
-                //odio viverra, molestie lectus nec, venenatis turpis.",
                 HtmlContent = HtmlContent,
-                //WebSettings = { DefaultEncoding = "utf-8" },
                 WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "ReportStyles.css") },
-                //HeaderSettings = { FontSize = 9, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 }
                 HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
                 FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
             };
@@ -58,6 +54,62 @@ namespace Plant_Sale_Tool
             byte[] pdf = converter.Convert(doc);
 
             return pdf;
+        }
+
+        public static byte[] ConvertDocument(HtmlToPdfDocument doc)
+        {
+            var converter = new BasicConverter(new PdfTools());
+            return converter.Convert(doc);
+        }
+
+        public HtmlToPdfDocument AddPageToPDF(string HtmlContent, string plantName, HtmlToPdfDocument doc = null)
+        {
+            if(doc == null)
+            {
+                doc = CreateHtmlToPdfDocument();
+            }
+
+            var page = new ObjectSettings
+            {
+                PagesCount = true,
+                HtmlContent = HtmlContent,
+                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "ReportStyles.css") },
+                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
+                FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Plant Sale - 2020" }
+            };
+
+            doc.Objects.Add(page);
+            return doc;
+
+        }
+
+        private GlobalSettings CreateGlobals()
+        {
+            var globalSettings = new GlobalSettings
+            {
+                ColorMode = ColorMode.Color,
+                Orientation = Orientation.Portrait,
+                PaperSize = PaperKind.A4,
+                Margins = new MarginSettings { Top = 10 },
+                DocumentTitle = string.Format("Plant Sale - 2020"),
+            };
+
+            return globalSettings;
+        }
+
+        private HtmlToPdfDocument CreateHtmlToPdfDocument(GlobalSettings setting = null)
+        {
+            if(setting == null)
+            {
+                setting = CreateGlobals();
+            }
+
+            var doc = new HtmlToPdfDocument()
+            {
+                GlobalSettings = setting,
+            };
+
+            return doc;
         }
     }
 }

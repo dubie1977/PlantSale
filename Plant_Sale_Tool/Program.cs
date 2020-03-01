@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using DinkToPdf;
 using OfficeOpenXml;
 
 namespace Plant_Sale_Tool
@@ -58,27 +59,36 @@ namespace Plant_Sale_Tool
             
     
             bool exit = false;
-            byte[] Fullpdf = null;
+            HtmlToPdfDocument pdfDocument = null;
             bool write = false;
+            bool writeAll = false;
             do
             {
                 Console.WriteLine();
+                Console.WriteLine("write or w = write selected plats out to SelectedPlants.pdf");
+                Console.WriteLine("all or a = write all plants to AllPlants.pdf");
+                Console.WriteLine("quit or q = quit application.");
                 Console.Write("Enter Plant Name or index that you want more info on:");
-                string requestedPlant = Console.ReadLine();
+                string userInput = Console.ReadLine();
                 int inputIndex = 999;
-                if (!int.TryParse(requestedPlant, out inputIndex))
+                if (!int.TryParse(userInput, out inputIndex))
                 {
-                    if (requestedPlant.ToLower() == "q" || requestedPlant.ToLower() == "quit")
+                    if (userInput.ToLower() == "q" || userInput.ToLower() == "quit")
                     {
                         break;
-                    } else if ((requestedPlant.ToLower() == "w" || requestedPlant.ToLower() == "write") && Fullpdf != null)
+                    } else if ((userInput.ToLower() == "w" || userInput.ToLower() == "write") && pdfDocument != null)
                     {
                         write = true;
-                    } else
+                    }
+                    else if (userInput.ToLower() == "a" || userInput.ToLower() == "all")
+                    {
+                        writeAll = true;
+                    }
+                    else
                     {
                         foreach (Plant p in plants)
                         {
-                            if (requestedPlant.ToLower() == p.Name.ToLower())
+                            if (userInput.ToLower() == p.Name.ToLower())
                             {
                                 inputIndex = plants.IndexOf(p);
                                 break;
@@ -92,11 +102,24 @@ namespace Plant_Sale_Tool
                 }
 
 
-                if (write == true)
+                if (write)
                 {
-                    File.WriteAllBytes("SelectedPlants.pdf", Fullpdf);
-                    Fullpdf = null;
+                    File.WriteAllBytes("SelectedPlants.pdf", PdfCreatorController.ConvertDocument(pdfDocument));
+                    pdfDocument = null;
                     write = false;
+                }
+                else if (writeAll)
+                {
+                    PdfCreatorController pdfCreator = new PdfCreatorController();
+                    foreach (Plant p in plants)
+                    {
+                        string html = HTMLGenerator.GetHTMLString(p);
+                        pdfDocument = pdfCreator.AddPageToPDF(html, p.Name, pdfDocument);
+                    }
+
+                    File.WriteAllBytes("AllPlants.pdf", PdfCreatorController.ConvertDocument(pdfDocument));
+                    pdfDocument = null;
+                    writeAll = false;
                 }
                 else if (inputIndex == 999)
                 {
@@ -108,13 +131,8 @@ namespace Plant_Sale_Tool
                     TableHelper.WriteTable(selectedPlant);
                     string html = HTMLGenerator.GetHTMLString(selectedPlant);
                     Console.WriteLine();
-                    //using (StreamWriter outputFile = new StreamWriter(string.Format("{0}.html",selectedPlant.Name)))
-                    //{
-                    //        outputFile.WriteLine(html);
-                    //}
                     PdfCreatorController pdfCreator = new PdfCreatorController();
-                    byte[] pdf = pdfCreator.CreatePDF(html, selectedPlant.Name);
-                    Fullpdf = Combine(Fullpdf, pdf);
+                    pdfDocument = pdfCreator.AddPageToPDF(html, selectedPlant.Name, pdfDocument);
 
 
                 }
