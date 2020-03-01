@@ -5,7 +5,9 @@ namespace Plant_Sale_Tool
     {
         static int tableWidth = 73;
 
-        public TableHelper(Plant plant, int tableWidth=73)
+        public TableHelper() { }
+
+        public static void WriteTable(Plant plant, int tableWidth=73)
         {
             Console.Clear();
             Console.WriteLine(string.Format("Plant {0} has {1} orders", plant.Name, plant.Orders.Count));

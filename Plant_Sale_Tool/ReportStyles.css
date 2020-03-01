@@ -1,0 +1,23 @@
+﻿.header {
+    text-align: center;
+    color: green;
+    font-size: 50px;
+    padding-bottom: 55px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 20px solid gray;
+    padding: 15px;
+    font-size: 80px;
+    text-align: center;
+}
+
+table th {
+    background-color: green;
+    color: white;
+}
