@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using DinkToPdf;
+using Markdig;
 using OfficeOpenXml;
 
 namespace Plant_Sale_Tool
@@ -55,6 +56,8 @@ namespace Plant_Sale_Tool
                 Console.WriteLine(string.Format("Workbook not found in {0}", pathToUse));
                 Environment.Exit(1);
             }
+
+            CreateDocumentation();
 
             
     
@@ -162,6 +165,16 @@ namespace Plant_Sale_Tool
             Buffer.BlockCopy(first, 0, bytes, 0, first.Length);
             Buffer.BlockCopy(second, 0, bytes, first.Length, second.Length);
             return bytes;
+        }
+
+        private static void CreateDocumentation()
+        {
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            var html = Markdown.ToHtml("This is a text with some *emphasis*  ", pipeline);
+
+            PdfCreatorController pdfCreator = new PdfCreatorController();
+            HtmlToPdfDocument pdfDocument = pdfCreator.AddPageToPDF(html, "Plante Sale Guide");
+            File.WriteAllBytes("Plant Sale Guide.pdf", PdfCreatorController.ConvertDocument(pdfDocument));
         }
     }
 }
