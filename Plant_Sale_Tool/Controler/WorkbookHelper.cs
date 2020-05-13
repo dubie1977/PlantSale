@@ -13,6 +13,10 @@ namespace Plant_Sale_Tool
             this.worksheet = worksheet;
         }
 
+        /// <summary>
+        /// Reads the workbook
+        /// </summary>
+        /// <returns></returns>
         public List<Plant> ReadWorkBook()
         {
             List<Plant> Plants = ReadPlants();
@@ -21,6 +25,11 @@ namespace Plant_Sale_Tool
             return PlantOrders;
         }
 
+        /// <summary>
+        /// Reads only the list of plants.
+        /// This should be Column A starting with row 2
+        /// </summary>
+        /// <returns>List of plants</returns>
         private List<Plant> ReadPlants()
         {
             List<Plant> plants = new List<Plant>();
@@ -46,24 +55,30 @@ namespace Plant_Sale_Tool
             return plants;
         }
 
+        /// <summary>
+        /// Reads the orders for all the plants and adds them to the correct plant.
+        /// </summary>
+        /// <param name="plants">List of plants</param>
+        /// <returns>Fully populated order list</returns>
         private List<Plant> ReadOrders(List<Plant> plants)
         {
+            //Read all of the rows in a coloum before moving to the next column
             List<Plant> PlantsWOrders = plants;
             bool stop = false;
+            //Loop though all of the orders
             int index = 2;
             do
             {
-                //string value = worksheet.Cells["A" + index.ToString()].Text;
-                
 
                 if (worksheet.GetValue(2, index) == null)
                 {
                     break;
                 }
+                //Grab seller and customer for all of the orders
                 string seller = (string)worksheet.GetValue(1, index);
                 string customer = (string)worksheet.GetValue(2, index);
-                //Console.WriteLine(string.Format("Cell A{0} = {1}", index, value));
 
+                //Loop though all of the plants in that order and add those orders to the correct plant.
                 int pIndex = 3;
                 do
                 {
@@ -77,14 +92,6 @@ namespace Plant_Sale_Tool
                 } while (pIndex - 3 <= plants.Count);
                 index++;
             } while (!stop);
-            Order newOrder = new Order
-                (
-                    (string)worksheet.GetValue(1, 7),
-                    (string)worksheet.GetValue(2, 7),
-                    (double)worksheet.GetValue(3, 7)
-                );
-            PlantsWOrders[0].Orders.Add(newOrder);
-
             return PlantsWOrders;
         }
     }
