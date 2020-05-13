@@ -62,7 +62,7 @@ namespace Plant_Sale_Tool
             return converter.Convert(doc);
         }
 
-        public HtmlToPdfDocument AddPageToPDF(string HtmlContent, string plantName, HtmlToPdfDocument doc = null)
+        public HtmlToPdfDocument AddPageToPDF(string HtmlContent, string plantName, HtmlToPdfDocument doc = null, bool useCss = true)
         {
             if(doc == null)
             {
@@ -77,6 +77,8 @@ namespace Plant_Sale_Tool
                 HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
                 FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Plant Sale - 2020" }
             };
+
+            if (!useCss) { page.WebSettings = null; }
 
             doc.Objects.Add(page);
             return doc;
